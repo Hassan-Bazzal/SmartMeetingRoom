@@ -32,4 +32,10 @@ class Employee extends Model
     {
         return $this->hasMany(Minute::class);
     }
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+    ];
 }
