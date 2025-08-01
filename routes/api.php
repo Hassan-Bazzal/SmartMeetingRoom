@@ -22,3 +22,4 @@ Route::apiResource('employees', AuthController::class);
 Route::apiResource('attachments', \App\Http\Controllers\API\AttachmentController::class);
 Route::apiResource('rooms', \App\Http\Controllers\API\RoomController::class);
 Route::apiResource('bookings', \App\Http\Controllers\API\BookingController::class);
+Route::apiResource('attendees', \App\Http\Controllers\API\AttendeeController::class);
