@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('location')->nullable();
             $table->integer('capacity')->nullable();
             $table->text('features')->nullable(); // e.g., projector, whiteboard, video conferencing
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('created_by')->constrained('employees')->onDelete('cascade');
             $table->timestamps();
         });
     }

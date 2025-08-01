@@ -12,4 +12,10 @@ class Notification extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+    protected $fillable = [
+        'employee_id',
+        'type',
+        'message',
+        'is_read',
+    ];
 }

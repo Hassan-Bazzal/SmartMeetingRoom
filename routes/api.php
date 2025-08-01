@@ -19,3 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::apiResource('employees', AuthController::class);
+Route::apiResource('attachments', \App\Http\Controllers\API\AttachmentController::class);
+Route::apiResource('rooms', \App\Http\Controllers\API\RoomController::class);
+Route::apiResource('bookings', \App\Http\Controllers\API\BookingController::class);

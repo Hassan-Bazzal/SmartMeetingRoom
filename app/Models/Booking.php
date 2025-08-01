@@ -23,4 +23,5 @@ class Booking extends Model
     public function minutes()
     {        return $this->hasMany(Minute::class);
     }
+    protected $fillable = ['room_id', 'user_id', 'start_time', 'end_time', 'status', 'agenda', 'title'];
 }

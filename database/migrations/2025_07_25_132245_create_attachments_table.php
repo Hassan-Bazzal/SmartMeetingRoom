@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('file_name'); // Name of the file
             $table->string('file_path'); // Path to the file in storage
-            $table->foreignId('uploaded_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('uploaded_by')->constrained('employees')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -21,4 +21,14 @@ class Minute extends Model
     {
         return $this->hasMany(Attachment::class);
     }
+    protected $fillable = [
+        'booking_id',
+        'created_by',
+        'content',
+        'status',
+        'due_date',
+        'notes',
+        'assigned_to',
+        
+    ];
 }

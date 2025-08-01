@@ -16,4 +16,11 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
+    protected $fillable = [
+        'name',
+        'capacity',
+        'location',
+        'features',
+        'created_by',
+    ];
 }

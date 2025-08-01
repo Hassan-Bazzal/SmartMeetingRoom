@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('attendees', function (Blueprint $table) {
             $table->id();
-             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade'); // Reference to the booking
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // User who is an attendee
+            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade'); // Reference to the booking
+            $table->foreignId('user_id')->constrained('employees')->onDelete('cascade'); // User who is an attendee
             $table->string('status')->default('pending');
             $table->timestamps();
         });

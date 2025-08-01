@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('attachments', function (Blueprint $table) {
-            $table->foreignId('room_id')->nullable()->constrained('rooms')->onDelete('set null'); // Reference to the room
+            $table->foreignId('minute_id')->nullable()->constrained('minutes')->onDelete('set null'); // Reference to the minute
         });
     }
 
@@ -26,8 +26,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('attachments', function (Blueprint $table) {
-            $table->dropForeign(['room_id']);
-            $table->dropColumn('room_id');
+            $table->dropForeign(['minute_id']);
+            $table->dropColumn('minute_id');
         });
     }
 };

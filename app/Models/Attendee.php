@@ -16,4 +16,9 @@ class Attendee extends Model
     {
         return $this->belongsTo(Booking::class);
     }
+    protected $fillable = [
+        'booking_id',
+        'user_id',
+        'status',
+    ];
 }

@@ -16,4 +16,6 @@ class Attachment extends Model
     {
         return $this->belongsTo(Minute::class);
     }
+    
+    protected $fillable = ['file_path', 'file_name', 'employee_id', 'minute_id'];
 }

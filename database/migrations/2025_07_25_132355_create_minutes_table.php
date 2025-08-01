@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
              $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade'); // Reference to the booking
             $table->text('content'); // Minutes content
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // User who created the minutes
-            $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); // User assigned to review or follow up on the minutes
+            $table->foreignId('created_by')->constrained('employees')->onDelete('cascade'); // User who created the minutes
+            $table->foreignId('assigned_to')->nullable()->constrained('employees')->onDelete('set null'); // User assigned to review or follow up on the minutes
             $table->string('status')->default('draft'); // Status of the minutes (draft, final, reviewed)
             $table->text('notes')->nullable(); // Additional notes or comments
             $table->timestamp('due_date')->nullable();
