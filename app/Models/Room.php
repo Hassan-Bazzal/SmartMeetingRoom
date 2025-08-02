@@ -10,7 +10,7 @@ class Room extends Model
     use HasFactory;
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'created_by');
     }
     public function bookings()
     {

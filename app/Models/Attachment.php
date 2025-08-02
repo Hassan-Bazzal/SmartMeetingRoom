@@ -10,12 +10,12 @@ class Attachment extends Model
     use HasFactory;
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class,'uploaded_by');
     }
     public function minute()
     {
         return $this->belongsTo(Minute::class);
     }
-    
-    protected $fillable = ['file_path', 'file_name', 'employee_id', 'minute_id'];
+
+    protected $fillable = ['file_path', 'file_name', 'uploaded_by', 'minute_id'];
 }

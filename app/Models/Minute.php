@@ -11,7 +11,7 @@ class Minute extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class,'assigned_to');
     }
     public function booking()
     {
