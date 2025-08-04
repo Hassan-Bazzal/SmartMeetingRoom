@@ -6,9 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\Employee;
+use App\Http\Traits\AuthorizesEmployee;
 
 class RoomController extends Controller
 {
+    use AuthorizesEmployee;
+
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -37,6 +44,7 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
+        $this->forbidIfNotAdmin($request);
         $request->validate([
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
@@ -89,6 +97,7 @@ class RoomController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->forbidIfNotAdmin($request);
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'capacity' => 'sometimes|required|integer|min:1',
@@ -110,6 +119,7 @@ class RoomController extends Controller
      */
     public function destroy($id)
     {
+        $this->forbidIfNotAdmin(request());
         $room = Room::findOrFail($id);
         $room->delete();
         

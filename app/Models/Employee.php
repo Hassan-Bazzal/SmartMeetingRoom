@@ -4,14 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Employee extends Model
+class Employee extends Authenticatable
 {
     use HasFactory;
-    public function attendees()
-    {
-        return $this->hasMany(Attendee::class);
-    }
+    use HasApiTokens;
+
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_USER  = 'user';
+    public const ROLE_GUEST = 'guest';
+
+ public function attendees()
+{
+    return $this->hasMany(Attendee::class, 'user_id'); // specify FK if not standard
+}
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);

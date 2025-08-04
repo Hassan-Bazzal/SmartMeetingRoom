@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\AttachmentController;
+use App\Http\Controllers\API\RoomController;
+use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\AttendeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +22,16 @@ use App\Http\Controllers\API\AuthController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::apiResource('employees', AuthController::class);
-Route::apiResource('attachments', \App\Http\Controllers\API\AttachmentController::class);
-Route::apiResource('rooms', \App\Http\Controllers\API\RoomController::class);
-Route::apiResource('bookings', \App\Http\Controllers\API\BookingController::class);
-Route::apiResource('attendees', \App\Http\Controllers\API\AttendeeController::class);
+
+Route::post('login', [AuthController::class, 'login']);
+Route::apiResource('attachments', AttachmentController::class);
+Route::apiResource('rooms', RoomController::class);
+Route::apiResource('bookings', BookingController::class);
+Route::apiResource('attendees', AttendeeController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('me', [AuthController::class, 'me']);
+
+    // Only admin (token with 'admin' ability + role) can manage employees
+    Route::apiResource('employees', AuthController::class);
+});

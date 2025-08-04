@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\Employee;
 use App\Models\Booking;
+use App\Http\Traits\AuthorizesEmployee;
 
 class BookingController extends Controller
 {
+    use AuthorizesEmployee;
+
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,6 +24,7 @@ class BookingController extends Controller
      */
     public function index()
     {
+
         return response()->json(['message' => 'Bookings retrieved successfully', 'bookings' => Booking::all()], 200);
     }
 
@@ -92,10 +100,13 @@ class BookingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    { $booking = Booking::findOrFail($id);
+        
+           if (auth()->id() !== $booking->user_id) {
+        return response()->json(['message' => 'Forbidden: you did not create this booking'], 403);
+    }
         $request->validate([
             'room_id' => 'sometimes|required|exists:rooms,id',
-            'booked_by' => 'sometimes|required|exists:employees,id',
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after:start_time',
             'status' => 'nullable|string|in:pending,confirmed,cancelled',
@@ -103,7 +114,9 @@ class BookingController extends Controller
             'title' => 'nullable|string|max:255',
         ]);
         
-        $booking = Booking::findOrFail($id);
+        
+       
+       
         $booking->update($request->only(['room_id', 'booked_by', 'start_time', 'end_time', 'status', 'agenda', 'title']));
         
         return response()->json(['message' => 'Booking updated successfully', 'booking' => $booking], 200);

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use App\Models\Minute;
+use App\Policies\MinutePolicy;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -13,6 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+         Minute::class => MinutePolicy::class,
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 

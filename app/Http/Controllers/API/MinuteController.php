@@ -35,15 +35,30 @@ class MinuteController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'assigned_to' => 'required|exists:employees,id',
-            'content' => 'required|string|max:10000',
-            'status' => 'required|string|in:pending,approved,rejected',
-            'note' => 'nullable|string|max:255',
-            'due_date' => 'nullable|date',
-            
-        ]);
+     $request->validate([
+        'booking_id' => 'required|exists:bookings,id',
+        'assigned_to' => 'required|exists:employees,id',
+        'content' => 'required|string|max:10000',
+        'status' => 'required|string|in:pending,approved,rejected',
+        'note' => 'nullable|string|max:255',
+        'due_date' => 'nullable|date',
+    ]);
+
+    $user = $request->user();
+
+    // Authorize with booking_id for create
+    $this->authorize('create', [Minute::class, $request->booking_id]);
+
+    $minute = Minute::create([
+        'booking_id' => $request->booking_id,
+        'assigned_to' => $request->assigned_to,
+        'content' => $request->content,
+        'status' => $request->status,
+        'note' => $request->note,
+        'due_date' => $request->due_date,
+    ]);
+
+    return response()->json(['message' => 'Minute created successfully', 'minute' => $minute], 201);
     }
 
     /**
@@ -54,7 +69,10 @@ class MinuteController extends Controller
      */
     public function show($id)
     {
-        //
+         $minute = Minute::findOrFail($id);
+    $this->authorize('view', $minute);
+
+    return response()->json(['message' => 'Minute retrieved successfully', 'minute' => $minute], 200);
     }
 
     /**

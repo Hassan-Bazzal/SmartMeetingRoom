@@ -7,16 +7,23 @@ use Illuminate\Http\Request;
 use App\Models\Attendee;
 use App\Models\Booking;
 use App\Models\Employee;
+use App\Http\Traits\AuthorizesEmployee;
 
 class AttendeeController extends Controller
 {
+    use AuthorizesEmployee;
+      public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+          $this->forbidIfNotAdmin($request);
         return response()->json(['message' => 'Attendees retrieved successfully', 'attendees' => Attendee::with(['employee', 'booking'])->get()], 200);
     }
 
