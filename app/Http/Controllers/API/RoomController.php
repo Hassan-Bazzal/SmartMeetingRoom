@@ -14,7 +14,7 @@ class RoomController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
     /**
      * Display a listing of the resource.
@@ -44,13 +44,13 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
+        $user = $request->user();
         $this->forbidIfNotAdmin($request);
         $request->validate([
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'location' => 'nullable|string|max:255',
             'features' => 'nullable|string|max:255', // e.g., projector, whiteboard, video conferencing
-            'created_by' => 'required|exists:employees,id',
         ]);
       
         
@@ -59,7 +59,7 @@ class RoomController extends Controller
             'capacity' => $request->capacity,
             'location' => $request->location,
             'features' => $request->features,
-            'created_by' => $request->created_by,
+            'created_by' => $user->id,
         ]);
         
         return response()->json(['message' => 'Room created successfully', 'room' => $room], 201);

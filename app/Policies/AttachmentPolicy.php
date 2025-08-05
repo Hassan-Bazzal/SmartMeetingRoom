@@ -2,12 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Minute;
-use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Models\Employee;
+use App\Models\Attachment;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class MinutePolicy
+class AttachmentPolicy
 {
     use HandlesAuthorization;
 
@@ -26,12 +25,12 @@ class MinutePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Minute  $minute
+     * @param  \App\Models\Attachment  $attachment
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(Employee $employee, Minute $minute)
+    public function view(User $user, Attachment $attachment)
     {
-         return $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+        //
     }
 
     /**
@@ -40,47 +39,45 @@ class MinutePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(Employee $employee)
+    public function create(User $user)
     {
-        return \App\Models\Attendee::where('booking_id', $bookingId)
-            ->where('user_id', $employee->id)
-            ->exists();
+        //
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Minute  $minute
+     * @param  \App\Models\Attachment  $attachment
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Minute $minute)
+    public function update(User $user, Attachment $attachment)
     {
-         return $minute->created_by === $employee->id
-        && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+         return $attachment->uploaded_by === $employee->id &&
+               $attachment->minute &&
+               $attachment->minute->assigned_to === $employee->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Minute  $minute
+     * @param  \App\Models\Attachment  $attachment
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Minute $minute)
+    public function delete(User $user, Attachment $attachment)
     {
-        return $minute->created_by === $employee->id
-        && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+        return $this->update($employee, $attachment);
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Minute  $minute
+     * @param  \App\Models\Attachment  $attachment
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Minute $minute)
+    public function restore(User $user, Attachment $attachment)
     {
         //
     }
@@ -89,10 +86,10 @@ class MinutePolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Minute  $minute
+     * @param  \App\Models\Attachment  $attachment
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Minute $minute)
+    public function forceDelete(User $user, Attachment $attachment)
     {
         //
     }

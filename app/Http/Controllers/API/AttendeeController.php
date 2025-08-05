@@ -12,10 +12,10 @@ use App\Http\Traits\AuthorizesEmployee;
 class AttendeeController extends Controller
 {
     use AuthorizesEmployee;
-      public function __construct()
-    {
-        $this->middleware('auth:sanctum');
-    }
+   public function __construct()
+{
+    $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
+}
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +23,6 @@ class AttendeeController extends Controller
      */
     public function index(Request $request)
     {
-          $this->forbidIfNotAdmin($request);
         return response()->json(['message' => 'Attendees retrieved successfully', 'attendees' => Attendee::with(['employee', 'booking'])->get()], 200);
     }
 
@@ -50,6 +49,13 @@ class AttendeeController extends Controller
             'user_id' => 'required|exists:employees,id',
             'status' => 'nullable|string|in:confirmed,cancelled,invited',
         ]);
+        $booking = Booking::findOrFail($request->booking_id);
+
+    // Check if the authenticated user is the creator of this booking
+    if ($booking->user_id !== $request->user()->id) {
+        return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
+    }
+
         $attendee = Attendee::create([
             'booking_id' => $request->booking_id,
             'user_id' => $request->user_id,
@@ -96,8 +102,15 @@ class AttendeeController extends Controller
             'user_id' => 'sometimes|exists:employees,id',
             'status' => 'sometimes|string|in:confirmed,cancelled,invited',
         ]);
+         $attendee = Attendee::findOrFail($id);
+        $booking = $attendee->booking;
+
+    // Check ownership
+    if ($booking->user_id !== $request->user()->id) {
+        return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
+    }
         
-        $attendee = Attendee::findOrFail($id);
+       
         $attendee->update($request->only(['booking_id', 'user_id', 'status']));
         
         return response()->json(['message' => 'Attendee updated successfully', 'attendee' => $attendee], 200);
@@ -112,6 +125,12 @@ class AttendeeController extends Controller
     public function destroy($id)
     {
         $attendee = Attendee::findOrFail($id);
+        $booking = $attendee->booking;
+
+    // Check ownership
+    if ($booking->user_id !== $request->user()->id) {
+        return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
+    }
         $attendee->delete();
         
         return response()->json(['message' => 'Attendee deleted successfully'], 200);

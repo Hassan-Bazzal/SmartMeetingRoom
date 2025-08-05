@@ -9,13 +9,19 @@ class Minute extends Model
 {
     use HasFactory;
 
-    public function employee()
-    {
-        return $this->belongsTo(Employee::class,'assigned_to');
-    }
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+    
+    public function assignedTo()
+    {
+        return $this->belongsTo(Employee::class, 'assigned_to');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Employee::class, 'created_by');
     }
     public function attachments()
     {

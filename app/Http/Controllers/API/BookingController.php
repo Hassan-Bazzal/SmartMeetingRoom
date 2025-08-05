@@ -48,7 +48,6 @@ class BookingController extends Controller
     {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
-            'booked_by' => 'required|exists:employees,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'status' => 'nullable|string|in:pending,confirmed,cancelled',
@@ -58,7 +57,7 @@ class BookingController extends Controller
         
         $booking = Booking::create([
             'room_id' => $request->room_id,
-            'user_id' => $request->booked_by,
+            'user_id' => $request->user()->id,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'status' => $request->status ?? 'pending',
@@ -131,6 +130,10 @@ class BookingController extends Controller
     public function destroy($id)
     {
         $booking = Booking::findOrFail($id);
+        
+           if (auth()->id() !== $booking->user_id) {
+        return response()->json(['message' => 'Forbidden: you did not create this booking'], 403);
+    }
         $booking->delete();
         
         return response()->json(['message' => 'Booking deleted successfully'], 200);

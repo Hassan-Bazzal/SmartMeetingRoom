@@ -16,6 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
          Minute::class => MinutePolicy::class,
+         \App\Models\Attachment::class => \App\Policies\AttachmentPolicy::class,
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
