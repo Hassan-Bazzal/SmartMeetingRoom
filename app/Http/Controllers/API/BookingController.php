@@ -15,7 +15,7 @@ class BookingController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -54,6 +54,27 @@ class BookingController extends Controller
             'agenda' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
         ]);
+           $roomId = $request->room_id;
+    $startTime = $request->start_time;
+    $endTime = $request->end_time;
+
+    //  Check if room is already booked at that time
+    $conflictingBooking = Booking::where('room_id', $roomId)
+        ->where(function ($query) use ($startTime, $endTime) {
+            $query->whereBetween('start_time', [$startTime, $endTime])
+                  ->orWhereBetween('end_time', [$startTime, $endTime])
+                  ->orWhere(function ($q) use ($startTime, $endTime) {
+                      $q->where('start_time', '<=', $startTime)
+                        ->where('end_time', '>=', $endTime);
+                  });
+        })
+        ->exists();
+
+    if ($conflictingBooking) {
+        return response()->json([
+            'message' => 'This room is already booked at the selected time.'
+        ], 422);
+    }
         
         $booking = Booking::create([
             'room_id' => $request->room_id,
@@ -112,6 +133,26 @@ class BookingController extends Controller
             'agenda' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
         ]);
+          $roomId = $request->room_id;
+    $startTime = $request->start_time;
+    $endTime = $request->end_time;
+
+    $conflictingBooking = Booking::where('room_id', $roomId)
+    ->where('id', '!=', $booking->id) // exclude current booking
+    ->where(function ($query) use ($startTime, $endTime) {
+        $query->whereBetween('start_time', [$startTime, $endTime])
+              ->orWhereBetween('end_time', [$startTime, $endTime])
+              ->orWhere(function ($q) use ($startTime, $endTime) {
+                  $q->where('start_time', '<=', $startTime)
+                    ->where('end_time', '>=', $endTime);
+              });
+    })
+    ->exists();
+ if ($conflictingBooking) {
+        return response()->json([
+            'message' => 'This room is already booked at the selected time.'
+        ], 422);
+    }
         
         
        

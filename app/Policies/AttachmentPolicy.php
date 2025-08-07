@@ -53,9 +53,7 @@ class AttachmentPolicy
      */
     public function update(User $user, Attachment $attachment)
     {
-         return $attachment->uploaded_by === $employee->id &&
-               $attachment->minute &&
-               $attachment->minute->assigned_to === $employee->id;
+        return $attachment->minute->assigned_to === $user->id;
     }
 
     /**
@@ -67,7 +65,7 @@ class AttachmentPolicy
      */
     public function delete(User $user, Attachment $attachment)
     {
-        return $this->update($employee, $attachment);
+         return $attachment->minute->assigned_to === $user->id;
     }
 
     /**

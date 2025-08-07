@@ -3,6 +3,8 @@
 namespace App\Providers;
 use App\Models\Minute;
 use App\Policies\MinutePolicy;
+use App\Models\Attachment;
+use App\Policies\AttachmentPolicy;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -16,7 +18,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
          Minute::class => MinutePolicy::class,
-         \App\Models\Attachment::class => \App\Policies\AttachmentPolicy::class,
+         Attachment::class => AttachmentPolicy::class,
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
