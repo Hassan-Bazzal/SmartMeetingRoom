@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Minute;
+use App\Models\Attendee;
 
 class MinuteController extends Controller
 {

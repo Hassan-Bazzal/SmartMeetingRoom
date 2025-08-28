@@ -44,30 +44,25 @@ class BookingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-            'status' => 'nullable|string|in:pending,confirmed,cancelled',
-            'agenda' => 'nullable|string|max:255',
-            'title' => 'nullable|string|max:255',
-        ]);
-           $roomId = $request->room_id;
+   public function store(Request $request)
+{
+    $request->validate([
+        'room_id' => 'required|exists:rooms,id',
+        'start_time' => 'required|date',
+        'end_time' => 'required|date|after:start_time',
+        'status' => 'nullable|string|in:pending,confirmed,cancelled',
+        'agenda' => 'nullable|string|max:255',
+        'title' => 'nullable|string|max:255',
+    ]);
+
+    $roomId = $request->room_id;
     $startTime = $request->start_time;
     $endTime = $request->end_time;
 
-    //  Check if room is already booked at that time
+    
     $conflictingBooking = Booking::where('room_id', $roomId)
-        ->where(function ($query) use ($startTime, $endTime) {
-            $query->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                      $q->where('start_time', '<=', $startTime)
-                        ->where('end_time', '>=', $endTime);
-                  });
-        })
+        ->where('start_time', '<', $endTime)
+        ->where('end_time', '>', $startTime)
         ->exists();
 
     if ($conflictingBooking) {
@@ -75,19 +70,23 @@ class BookingController extends Controller
             'message' => 'This room is already booked at the selected time.'
         ], 422);
     }
-        
-        $booking = Booking::create([
-            'room_id' => $request->room_id,
-            'user_id' => $request->user()->id,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'status' => $request->status ?? 'pending',
-            'agenda' => $request->agenda,
-            'title' => $request->title,
-        ]);
-        
-        return response()->json(['message' => 'Booking created successfully', 'booking' => $booking], 201);
-    }
+
+    $booking = Booking::create([
+        'room_id' => $roomId,
+        'user_id' => $request->user()->id,
+        'start_time' => $startTime,
+        'end_time' => $endTime,
+        'status' => $request->status ?? 'pending',
+        'agenda' => $request->agenda,
+        'title' => $request->title,
+    ]);
+
+    return response()->json([
+        'message' => 'Booking created successfully', 
+        'booking' => $booking
+    ], 201);
+}
+
 
     /**
      * Display the specified resource.
