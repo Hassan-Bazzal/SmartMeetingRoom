@@ -128,9 +128,9 @@ class AttendeeController extends Controller
         $booking = $attendee->booking;
 
     // Check ownership
-    if ($booking->user_id !== $request->user()->id) {
-        return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
-    }
+    if ($booking->user_id !== auth()->id()) {
+    return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
+}
         $attendee->delete();
         
         return response()->json(['message' => 'Attendee deleted successfully'], 200);

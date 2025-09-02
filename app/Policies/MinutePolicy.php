@@ -6,6 +6,7 @@ use App\Models\Minute;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\Booking;
 
 class MinutePolicy
 {
@@ -17,9 +18,9 @@ class MinutePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(User $user)
+   public function viewAny(Employee $employee)
     {
-        //
+        return true; // allow all authenticated employees to view list
     }
 
     /**
@@ -31,7 +32,8 @@ class MinutePolicy
      */
     public function view(Employee $employee, Minute $minute)
     {
-         return $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+          return $minute->booking 
+            && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
     }
 
     /**
@@ -40,11 +42,10 @@ class MinutePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(Employee $employee)
+    public function create(Employee $employee, Booking $booking)
     {
-        return \App\Models\Attendee::where('booking_id', $bookingId)
-            ->where('user_id', $employee->id)
-            ->exists();
+        // employee can only create minute if they are attendee of this booking
+        return $booking->attendees()->where('user_id', $employee->id)->exists();
     }
 
     /**
@@ -54,10 +55,11 @@ class MinutePolicy
      * @param  \App\Models\Minute  $minute
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Minute $minute)
+    public function update(Employee $employee, Minute $minute)
     {
-         return $minute->created_by === $employee->id
-        && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+        return $minute->created_by === $employee->id
+            && $minute->booking
+            && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
     }
 
     /**
@@ -67,10 +69,11 @@ class MinutePolicy
      * @param  \App\Models\Minute  $minute
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Minute $minute)
+    public function delete(Employee $employee, Minute $minute)
     {
         return $minute->created_by === $employee->id
-        && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
+            && $minute->booking
+            && $minute->booking->attendees()->where('user_id', $employee->id)->exists();
     }
 
     /**

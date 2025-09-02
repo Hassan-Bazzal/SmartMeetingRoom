@@ -37,3 +37,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Only admin (token with 'admin' ability + role) can manage employees
     Route::apiResource('employees', AuthController::class);
 });
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);

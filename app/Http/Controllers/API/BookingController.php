@@ -8,6 +8,7 @@ use App\Models\Room;
 use App\Models\Employee;
 use App\Models\Booking;
 use App\Http\Traits\AuthorizesEmployee;
+use App\Models\Notification;
 
 class BookingController extends Controller
 {
@@ -81,6 +82,11 @@ class BookingController extends Controller
         'title' => $request->title,
     ]);
 
+  Notification::create([
+            'user_id' => $request->user()->id,
+            'message' => "Booking '{$booking->title}' created successfully for Room ID {$roomId}.",
+            'type' => 'booking_created'
+        ]);
     return response()->json([
         'message' => 'Booking created successfully', 
         'booking' => $booking
@@ -157,6 +163,11 @@ class BookingController extends Controller
        
        
         $booking->update($request->only(['room_id', 'booked_by', 'start_time', 'end_time', 'status', 'agenda', 'title']));
+         Notification::create([
+            'user_id' => $request->user()->id,
+            'message' => "Booking '{$booking->title}' was updated successfully.",
+            'type' => 'booking_updated'
+        ]);
         
         return response()->json(['message' => 'Booking updated successfully', 'booking' => $booking], 200);
     }
@@ -175,6 +186,11 @@ class BookingController extends Controller
         return response()->json(['message' => 'Forbidden: you did not create this booking'], 403);
     }
         $booking->delete();
+         Notification::create([
+            'user_id' => auth()->id(),
+            'message' => "Booking '{$title}' was deleted successfully.",
+            'type' => 'booking_deleted'
+        ]);
         
         return response()->json(['message' => 'Booking deleted successfully'], 200);
     }
