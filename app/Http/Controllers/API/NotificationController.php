@@ -14,7 +14,11 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        return response()->json(['message' => 'Notifications retrieved successfully', 'notifications' => auth()->user()->notifications], 200);
+        return response()->json([
+    'message' => 'Notifications retrieved successfully',
+    'notifications' => auth()->user()->notifications()->latest()->get()
+], 200);
+
     }
 
     /**
@@ -38,18 +42,33 @@ class NotificationController extends Controller
         $request->validate([
             'type' => 'required|string|max:255',
             'message' => 'required|string|max:1000',
-            'is_read' => 'required|boolean',
+            'is_read' => 'boolean',
+            'user_id' => 'required|exists:employees,id',
         ]);
 
         $notification = auth()->user()->notifications()->create([
             'type' => $request->type,
             'message' => $request->message,
-            'is_read' => $request->is_read,
-            'user_id' => auth()->id(),
+            'is_read' => $request->is_read ?? false,
+            'user_id' => $request->user_id, 
         ]);
 
         return response()->json(['message' => 'Notification created successfully', 'notification' => $notification], 201);
     }
+   public function markAllAsRead()
+{
+    \Log::info('Mark all as read endpoint hit', ['user_id' => auth()->id()]);
+
+    $user = auth()->user();
+
+    \DB::table('notifications')
+        ->where('user_id', $user->id)
+        ->where('is_read', false)
+        ->update(['is_read' => true]);
+
+    return response()->json(['message' => 'All notifications marked as read']);
+}
+
 
     /**
      * Display the specified resource.

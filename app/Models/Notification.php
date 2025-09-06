@@ -13,7 +13,7 @@ class Notification extends Model
         return $this->belongsTo(Employee::class,'user_id');
     }
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'type',
         'message',
         'is_read',

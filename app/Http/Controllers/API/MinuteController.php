@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Minute;
 use App\Models\Attendee;
 use App\Models\Booking;
+use App\Models\Notification;
 
 class MinuteController extends Controller
 {
@@ -78,6 +79,11 @@ class MinuteController extends Controller
             'note' => $request->note,
             'due_date' => $request->due_date,
         ]);
+        Notification::create([
+            'user_id' => $minute->assigned_to,
+            'message' => "You have been assigned a new action item in meeting '{$booking->title}'.",
+            'type'    => 'mom_assigned'
+        ]);
 
         return response()->json([
             'message' => 'Minute created successfully',
@@ -133,6 +139,13 @@ class MinuteController extends Controller
         ]);
 
         $minute->update($request->only(['content', 'status', 'note', 'due_date']));
+         if ($request->has('status')) {
+            Notification::create([
+                'user_id' => $minute->assigned_to,
+                'message' => "Your assigned action item status has been updated to '{$minute->status}'.",
+                'type'    => 'mom_status_update'
+            ]);
+        }
 
         return response()->json([
             'message' => 'Minute updated successfully',
@@ -153,6 +166,11 @@ class MinuteController extends Controller
         $this->authorize('delete', $minute);
 
         $minute->delete();
+         Notification::create([
+            'user_id' => $assignedTo,
+            'message' => "An assigned action item '{$contentSnippet}...' was removed from the meeting.",
+            'type'    => 'mom_deleted'
+        ]);
 
         return response()->json([
             'message' => 'Minute deleted successfully'

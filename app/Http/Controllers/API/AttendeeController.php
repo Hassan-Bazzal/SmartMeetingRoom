@@ -8,6 +8,7 @@ use App\Models\Attendee;
 use App\Models\Booking;
 use App\Models\Employee;
 use App\Http\Traits\AuthorizesEmployee;
+use App\Models\Notification;
 
 class AttendeeController extends Controller
 {
@@ -61,6 +62,11 @@ class AttendeeController extends Controller
             'user_id' => $request->user_id,
             'status' => $request->status ?? 'invited',
         ]);
+         Notification::create([
+            'user_id' => $attendee->user_id,
+            'message' => "You have been invited to the meeting '{$booking->title}' scheduled on {$booking->start_time}.",
+            'type' => 'meeting_invitation',
+        ]);
         
         return response()->json(['message' => 'Attendee created successfully', 'attendee' => $attendee], 201);
     }
@@ -112,6 +118,13 @@ class AttendeeController extends Controller
         
        
         $attendee->update($request->only(['booking_id', 'user_id', 'status']));
+        if ($request->has('status')) {
+            Notification::create([
+                'user_id' => $attendee->user_id,
+                'message' => "Your invitation for meeting '{$booking->title}' has been updated to '{$attendee->status}'.",
+                'type' => 'invitation_status',
+            ]);
+        }
         
         return response()->json(['message' => 'Attendee updated successfully', 'attendee' => $attendee], 200);
     }
@@ -132,6 +145,11 @@ class AttendeeController extends Controller
     return response()->json(['message' => 'Forbidden: You are not the owner of this booking.'], 403);
 }
         $attendee->delete();
+         Notification::create([
+            'user_id' => $attendee->user_id,
+            'message' => "You have been removed from the meeting '{$booking->title}'.",
+            'type' => 'meeting_removed',
+        ]);
         
         return response()->json(['message' => 'Attendee deleted successfully'], 200);
     }

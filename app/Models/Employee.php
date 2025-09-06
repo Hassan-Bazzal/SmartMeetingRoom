@@ -33,10 +33,10 @@ class Employee extends Authenticatable
     {
         return $this->hasMany(Attachment::class);
     }
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
+   public function notifications()
+{
+    return $this->hasMany(Notification::class, 'user_id');
+}
     public function minutes()
     {
         return $this->hasMany(Minute::class);

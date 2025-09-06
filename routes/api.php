@@ -8,6 +8,7 @@ use App\Http\Controllers\API\RoomController;
 use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\AttendeeController;
 use App\Http\Controllers\API\MinuteController;
+use App\Http\Controllers\API\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +31,13 @@ Route::apiResource('rooms', RoomController::class);
 Route::apiResource('bookings', BookingController::class);
 Route::apiResource('attendees', AttendeeController::class);
 Route::apiResource('minutes', MinuteController::class);
+Route::middleware('auth:sanctum')->put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
+    Route::apiResource('notifications', NotificationController::class);
+    
+
 
     // Only admin (token with 'admin' ability + role) can manage employees
     Route::apiResource('employees', AuthController::class);
