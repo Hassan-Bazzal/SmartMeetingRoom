@@ -36,11 +36,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
     Route::apiResource('notifications', NotificationController::class);
+    Route::post('register', [AuthController::class, 'register']);
     
 
 
-    // Only admin (token with 'admin' ability + role) can manage employees
-    Route::apiResource('employees', AuthController::class);
+    
+   
+});
+Route::middleware('auth:sanctum')->post('/employees', [AuthController::class, 'store']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
 });
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);

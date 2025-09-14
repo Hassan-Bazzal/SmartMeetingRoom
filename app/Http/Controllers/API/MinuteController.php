@@ -167,8 +167,8 @@ class MinuteController extends Controller
 
         $minute->delete();
          Notification::create([
-            'user_id' => $assignedTo,
-            'message' => "An assigned action item '{$contentSnippet}...' was removed from the meeting.",
+            'user_id' => $minute->assigned_to,
+            'message' => "An assigned action item '{$minute->id}...' was removed from the meeting.",
             'type'    => 'mom_deleted'
         ]);
 

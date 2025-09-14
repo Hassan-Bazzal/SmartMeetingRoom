@@ -21,17 +21,17 @@ public function register(Request $request)
         'name' => 'required|string|max:255',
         'email' => ['required','string','email','max:255','unique:employees'],
         'password' => 'required|string|min:8|confirmed',
-        // public registration always creates non-admin
+        'role' => ['required', Rule::in([Employee::ROLE_USER, Employee::ROLE_ADMIN])],
     ]);
 
     $employee = Employee::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => bcrypt($request->password),
-        'role' => Employee::ROLE_USER,
+        'role' => $request->role,
     ]);
 
-    $token = $employee->createToken('api-token')->plainTextToken; // no admin ability
+    $token = $employee->createToken('api-token', $employee->role === Employee::ROLE_ADMIN ? ['admin'] : [])->plainTextToken;
 
     return response()->json([
         'message' => 'Registered',
@@ -106,10 +106,13 @@ public function logout(Request $request)
    if (! $this->isAdmin($request)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
+       
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:employees',
             'password' => 'required|string|min:8|confirmed',
+            'role' => ['required', Rule::in([Employee::ROLE_USER, Employee::ROLE_ADMIN])],
         ]);
         $employee = Employee::create([
             'name' => $request->name,
@@ -185,6 +188,41 @@ public function logout(Request $request)
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function changePassword(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'email' => 'required|email',
+        'oldPassword' => 'required|string',
+        'newPassword' => 'required|string|min:8|confirmed',
+    ]);
+
+    // Get the authenticated user
+    $employee = $request->user();
+
+    // Check that the email matches the authenticated user
+    if ($employee->email !== $request->email) {
+        return response()->json(['message' => 'Email does not match authenticated user'], 403);
+    }
+
+    // Verify old password
+    if (! Hash::check($request->oldPassword, $employee->password)) {
+        return response()->json(['message' => 'Old password is incorrect'], 400);
+    }
+
+    // Update with new password
+    $employee->password = Hash::make($request->newPassword);
+    $employee->save();
+
+    // Optional: Invalidate all other tokens (forces re-login)
+    $employee->tokens()->delete();
+
+     return response()->json([
+        'message' => 'Password updated successfully. Please log in again.'
+    ], 200);
+}
+
+
     public function destroy($id)
     {
         $employee = Employee::findOrFail($id);

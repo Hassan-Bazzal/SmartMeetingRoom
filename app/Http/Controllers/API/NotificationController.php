@@ -16,7 +16,7 @@ class NotificationController extends Controller
     {
         return response()->json([
     'message' => 'Notifications retrieved successfully',
-    'notifications' => auth()->user()->notifications()->latest()->get()
+    'notifications' => auth()->user()->notifications()->latest()->take(10)->get()
 ], 200);
 
     }
