@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::apiResource('notifications', NotificationController::class);
     Route::post('register', [AuthController::class, 'register']);
+    Route::apiResource('employees', AuthController::class);
     
 
 

@@ -185,10 +185,11 @@ class BookingController extends Controller
            if (auth()->id() !== $booking->user_id) {
         return response()->json(['message' => 'Forbidden: you did not create this booking'], 403);
     }
+    $bookingTitle = $booking->title;
         $booking->delete();
          Notification::create([
             'user_id' => auth()->id(),
-            'message' => "Booking '{$title}' was deleted successfully.",
+            'message' => "Booking '{$bookingTitle}' was deleted successfully.",
             'type' => 'booking_deleted'
         ]);
         
