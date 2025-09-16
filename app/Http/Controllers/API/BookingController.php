@@ -84,7 +84,7 @@ class BookingController extends Controller
 
   Notification::create([
             'user_id' => $request->user()->id,
-            'message' => "Booking '{$booking->title}' created successfully for Room ID {$roomId}.",
+            'message' => "Booking '{$booking->title}' created successfully for Room ID {$roomId} from time {$startTime} to {$endTime}.",
             'type' => 'booking_created'
         ]);
     return response()->json([
@@ -165,7 +165,7 @@ class BookingController extends Controller
         $booking->update($request->only(['room_id', 'booked_by', 'start_time', 'end_time', 'status', 'agenda', 'title']));
          Notification::create([
             'user_id' => $request->user()->id,
-            'message' => "Booking '{$booking->title}' was updated successfully.",
+            'message' => "Booking '{$booking->title}' was updated successfully and is now from {$booking->start_time} to {$booking->end_time}.",
             'type' => 'booking_updated'
         ]);
         
